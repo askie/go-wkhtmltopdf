@@ -11,8 +11,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
+	"syscall"
 )
 
 //the cached mutexed path as used by findPath()
@@ -299,7 +301,9 @@ func (pdfg *PDFGenerator) CreateContext(ctx context.Context) error {
 func (pdfg *PDFGenerator) run(ctx context.Context) error {
 	// create command
 	cmd := exec.CommandContext(ctx, pdfg.binPath, pdfg.Args()...)
-
+	if runtime.GOOS == "windows" {
+		cmd.SysProcAttr = &syscall.SysProcAttr{HideWindow: true}
+	}
 	// set stderr to the provided writer, or create a new buffer
 	var errBuf *bytes.Buffer
 	cmd.Stderr = pdfg.stdErr
@@ -361,8 +365,8 @@ func NewPDFPreparer() *PDFGenerator {
 		},
 		TOC: toc{
 			allTocOptions: allTocOptions{
-				tocOptions:  newTocOptions(),
-				pageOptions: newPageOptions(),
+				tocOptions:             newTocOptions(),
+				pageOptions:            newPageOptions(),
 				headerAndFooterOptions: newHeaderAndFooterOptions(),
 			},
 		},
