@@ -1,4 +1,4 @@
-module github.com/SebastiaanKlippert/go-wkhtmltopdf
+module github.com/askie/go-wkhtmltopdf
 
 go 1.18
 
